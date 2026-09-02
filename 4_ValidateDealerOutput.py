@@ -24,8 +24,8 @@ WHERE DealerId = ?;
 
 # The screenshot orders all staged rows by stageDateTime descending. TOP (1)
 # selects the latest value so it can be compared with the COUNT(*) result.
-LATEST_FEED_RAN_QUERY = """
-SELECT TOP (1) [v4FeedRan]
+LATEST_FEED_COUNT_QUERY = """
+SELECT TOP (1) [v4FeedCount]
 FROM [dbo].[SQS_Dealer_Staged]
 ORDER BY stageDateTime DESC;
 """
@@ -89,7 +89,7 @@ def fetch_single_value(cursor, query: str, parameters=None):
 
 
 def validate_outputs(dealer_ids: list[int]):
-    """Verify that DMS_Loading count equals the latest v4FeedRan value."""
+    """Verify that DMS_Loading count equals the latest v4FeedCount value."""
     connection = None
     cursor = None
     mismatches = []
@@ -103,15 +103,15 @@ def validate_outputs(dealer_ids: list[int]):
             loading_count = fetch_single_value(
                 cursor, DMS_LOADING_COUNT_QUERY, (dealer_id,)
             )
-            latest_feed_ran = fetch_single_value(cursor, LATEST_FEED_RAN_QUERY)
+            latest_feed_count = fetch_single_value(cursor, LATEST_FEED_COUNT_QUERY)
 
             print(
                 f"[{index}/{len(dealer_ids)}] DealerId={dealer_id}: "
-                f"DMS_Loading count={loading_count}, v4FeedRan={latest_feed_ran}"
+                f"DMS_Loading count={loading_count}, v4FeedCount={latest_feed_count}"
             )
 
-            if loading_count != latest_feed_ran:
-                mismatches.append((dealer_id, loading_count, latest_feed_ran))
+            if loading_count != latest_feed_count:
+                mismatches.append((dealer_id, loading_count, latest_feed_count))
 
     finally:
         if cursor is not None:
@@ -122,8 +122,8 @@ def validate_outputs(dealer_ids: list[int]):
 
     if mismatches:
         details = "; ".join(
-            f"DealerId={dealer_id}: count={count}, v4FeedRan={feed_ran}"
-            for dealer_id, count, feed_ran in mismatches
+            f"DealerId={dealer_id}: count={count}, v4FeedCount={feed_count}"
+            for dealer_id, count, feed_count in mismatches
         )
         raise RuntimeError(f"Validation failed. Output mismatch: {details}")
 
@@ -134,7 +134,7 @@ def parse_arguments():
     """Parse the optional DealerId command-line argument."""
     parser = argparse.ArgumentParser(
         description=(
-            "Compare the DMS_Loading count with the latest v4FeedRan value. "
+            "Compare the DMS_Loading count with the latest v4FeedCount value. "
             "Without a DealerId, values are read from input.txt."
         )
     )
