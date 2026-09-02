@@ -20,3 +20,14 @@ foreach ($path in $paths) {
 }
 
 [Environment]::SetEnvironmentVariable("Path", $currentPath, "User")
+
+
+
+$profilePath = $PROFILE.CurrentUserCurrentHost
+$profileDirectory = Split-Path -Parent $profilePath
+
+New-Item -ItemType Directory -Path $profileDirectory -Force | Out-Null
+
+if (-not (Test-Path -LiteralPath $profilePath)) {
+    New-Item -ItemType File -Path $profilePath -Force | Out-Null
+}
