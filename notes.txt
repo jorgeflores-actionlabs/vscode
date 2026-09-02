@@ -1,2 +1,0 @@
-$env:Path += ";C:\Users\jorge.flores\Documents\python"
-
