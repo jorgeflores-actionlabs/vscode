@@ -22,12 +22,10 @@ FROM [dbo].[DMS_Loading] WITH (NOLOCK)
 WHERE DealerId = ?;
 """
 
-# The screenshot orders all staged rows by stageDateTime descending. TOP (1)
-# selects the latest value so it can be compared with the COUNT(*) result.
-LATEST_FEED_COUNT_QUERY = """
-SELECT TOP (1) [v4FeedCount]
+DEALER_FEED_COUNT_QUERY = """
+SELECT [v4FeedCount]
 FROM [dbo].[SQS_Dealer_Staged]
-ORDER BY stageDateTime DESC;
+WHERE DealerId = ?;
 """
 
 
@@ -89,7 +87,7 @@ def fetch_single_value(cursor, query: str, parameters=None):
 
 
 def validate_outputs(dealer_ids: list[int]):
-    """Verify that DMS_Loading count equals the latest v4FeedCount value."""
+    """Verify that DMS_Loading count equals the dealer's v4FeedCount value."""
     connection = None
     cursor = None
     mismatches = []
@@ -103,15 +101,17 @@ def validate_outputs(dealer_ids: list[int]):
             loading_count = fetch_single_value(
                 cursor, DMS_LOADING_COUNT_QUERY, (dealer_id,)
             )
-            latest_feed_count = fetch_single_value(cursor, LATEST_FEED_COUNT_QUERY)
+            dealer_feed_count = fetch_single_value(
+                cursor, DEALER_FEED_COUNT_QUERY, (dealer_id,)
+            )
 
             print(
                 f"[{index}/{len(dealer_ids)}] DealerId={dealer_id}: "
-                f"DMS_Loading count={loading_count}, v4FeedCount={latest_feed_count}"
+                f"DMS_Loading count={loading_count}, v4FeedCount={dealer_feed_count}"
             )
 
-            if loading_count != latest_feed_count:
-                mismatches.append((dealer_id, loading_count, latest_feed_count))
+            if loading_count != dealer_feed_count:
+                mismatches.append((dealer_id, loading_count, dealer_feed_count))
 
     finally:
         if cursor is not None:
@@ -134,7 +134,7 @@ def parse_arguments():
     """Parse the optional DealerId command-line argument."""
     parser = argparse.ArgumentParser(
         description=(
-            "Compare the DMS_Loading count with the latest v4FeedCount value. "
+            "Compare the DMS_Loading count with the dealer's v4FeedCount value. "
             "Without a DealerId, values are read from input.txt."
         )
     )
