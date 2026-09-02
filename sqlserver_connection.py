@@ -18,9 +18,24 @@ try:
     print("Success!")
     cursor = connection.cursor()
     ###########################################################
-    sp_call = "EXEC [dbo].[SQS_SetStagedDealerForProcessing] @DealerId = ?, @FTPProfileFolder = ?, @S3ProfileFolder = ?, @DealerFolderName = ?"
-    arguments = ('Value1', 123)
+    sp_call = """
+    EXEC [dbo].[SQS_SetStagedDealerForProcessing]
+        @DealerId = ?,
+        @FTPProfileFolder = ?,
+        @S3ProfileFolder = ?,
+        @DealerFolderName = ?,
+        @S3GuidLookup = ?
+    """
 
+    arguments = [
+        123,
+        "folder1",
+        "folder2",
+        "dealer123",
+        0
+    ]
+
+    cursor.execute(sp_call, arguments)
     print("Executing stored procedure...")
     cursor.execute(sp_call, arguments)
     ###########################################################
