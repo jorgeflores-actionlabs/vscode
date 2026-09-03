@@ -1,2 +1,2 @@
-1967|c41ec4b9-98fe-4cb8-977d-3c73e16f580a|CDKLightspeed|CycleCityLTD
-2140|9af9d09c-4f56-4587-956f-fcc548633566|CDKLightspeed|HDWorld
+2371|750b3df7-24e5-41ed-806a-bf09dd459a31|CDKLightspeed|EuropeanCycleSports
+2374|e6e3e951-167c-4757-83ef-0b1ee7c28771|CDKLightspeed|HoffpauirPolaris
