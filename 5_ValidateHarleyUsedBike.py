@@ -4,7 +4,13 @@ from pathlib import Path
 import pyodbc
 
 try:
-    from console_colors import Colors, print_log
+    from console_colors import (
+        Colors,
+        print_banner,
+        print_log,
+        print_metric,
+        print_status,
+    )
 except ModuleNotFoundError:
     class Colors:
         """Fallback colors when the reusable helper is not beside this script."""
@@ -16,10 +22,34 @@ except ModuleNotFoundError:
         BLUE = "\033[94m"
         CYAN = "\033[96m"
         GRAY = "\033[90m"
+        WHITE = "\033[97m"
+        BOLD = "\033[1m"
 
     def print_log(message: str, color: str = Colors.RESET):
         """Print a colored log message without requiring another local file."""
         print(f"{color}{message}{Colors.RESET}")
+
+    def print_banner(title: str, subtitle: str = ""):
+        """Print a section banner without requiring another local file."""
+        line = "=" * 72
+        print_log(line, Colors.CYAN)
+        print_log(f"  {title}", f"{Colors.BOLD}{Colors.CYAN}")
+        if subtitle:
+            print_log(f"  {subtitle}", Colors.GRAY)
+        print_log(line, Colors.CYAN)
+
+    def print_metric(label: str, value, color: str = Colors.RESET):
+        """Print an aligned label/value pair."""
+        print_log(f"  {label:<28} {value}", color)
+
+    def print_status(status: str, details: str = ""):
+        """Print a prominently colored validation status."""
+        normalized_status = status.upper()
+        color = Colors.GREEN if normalized_status == "MATCHED" else Colors.RED
+        message = f"[ {normalized_status:^10} ]"
+        if details:
+            message = f"{message} {details}"
+        print_log(message, f"{Colors.BOLD}{color}")
 
 
 SERVER = "sqlag_pdxsql.external.pie.pdx.dealerspike.com"
@@ -124,7 +154,7 @@ def validate_dealer(dealer_id: int):
     cursor = None
 
     try:
-        print_log(f"Connecting to {SERVER}/{DATABASE}...", Colors.CYAN)
+        print_log(f"  Connecting to {SERVER}/{DATABASE}...", Colors.CYAN)
         connection = pyodbc.connect(CONNECTION_STRING)
         cursor = connection.cursor()
 
@@ -136,15 +166,17 @@ def validate_dealer(dealer_id: int):
         matched_count = len(matched_ids)
         status = "MATCHED" if not missing_ids and source_count == matched_count else "MISMATCH"
 
-        print_log(
-            f"DealerId={dealer_id}: harley_used_bike records={source_count}, "
-            f"matched hubid records={matched_count}, status={status}",
-            Colors.GREEN if status == "MATCHED" else Colors.RED,
+        print_metric("DealerId", dealer_id, Colors.WHITE)
+        print_metric("harley_used_bike records", source_count)
+        print_metric("matched hubid records", matched_count)
+        print_status(
+            status,
+            f"{source_count} source / {matched_count} matched",
         )
 
         if missing_ids:
             print_log(
-                f"Missing hubid values ({len(missing_ids)}): {sorted(missing_ids)}",
+                f"  Missing hubid values ({len(missing_ids)}): {sorted(missing_ids)}",
                 Colors.YELLOW,
             )
 
@@ -159,7 +191,7 @@ def validate_dealer(dealer_id: int):
             cursor.close()
         if connection is not None:
             connection.close()
-            print_log("Database connection closed.", Colors.GRAY)
+            print_log("  Database connection closed.", Colors.GRAY)
 
 
 def parse_arguments():
@@ -184,20 +216,25 @@ def main():
 
     if args.dealer_id is None:
         dealer_ids = read_dealer_ids(INPUT_FILE)
-        print_log(
-            f"File mode: loaded {len(dealer_ids)} DealerId value(s) from {INPUT_FILE}.",
-            Colors.BLUE,
+        mode_description = (
+            f"File mode | {len(dealer_ids)} DealerId value(s) loaded from {INPUT_FILE}"
         )
     else:
         dealer_ids = [validate_dealer_id(args.dealer_id)]
-        print_log(f"Single-dealer mode: DealerId={dealer_ids[0]}.", Colors.BLUE)
+        mode_description = f"Single-dealer mode | DealerId={dealer_ids[0]}"
+
+    print_banner(
+        "HARLEY USED-BIKE VALIDATION",
+        mode_description,
+    )
 
     for dealer_id in dealer_ids:
+        print_log(f"\nDealer {dealer_id}", f"{Colors.BOLD}{Colors.BLUE}")
         validate_dealer(dealer_id)
 
-    print_log(
-        f"Validation passed for {len(dealer_ids)} DealerId value(s).",
-        Colors.GREEN,
+    print_banner(
+        "VALIDATION COMPLETE",
+        f"{len(dealer_ids)} DealerId value(s) passed successfully",
     )
 
 
