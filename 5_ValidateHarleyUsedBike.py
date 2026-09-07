@@ -3,7 +3,23 @@ from pathlib import Path
 
 import pyodbc
 
-from console_colors import Colors, print_log
+try:
+    from console_colors import Colors, print_log
+except ModuleNotFoundError:
+    class Colors:
+        """Fallback colors when the reusable helper is not beside this script."""
+
+        RESET = "\033[0m"
+        RED = "\033[91m"
+        GREEN = "\033[92m"
+        YELLOW = "\033[93m"
+        BLUE = "\033[94m"
+        CYAN = "\033[96m"
+        GRAY = "\033[90m"
+
+    def print_log(message: str, color: str = Colors.RESET):
+        """Print a colored log message without requiring another local file."""
+        print(f"{color}{message}{Colors.RESET}")
 
 
 SERVER = "sqlag_pdxsql.external.pie.pdx.dealerspike.com"
