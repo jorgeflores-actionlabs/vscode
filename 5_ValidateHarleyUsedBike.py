@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pyodbc
 
+from console_colors import Colors, print_log
+
 
 SERVER = "sqlag_pdxsql.external.pie.pdx.dealerspike.com"
 DATABASE = "DMS_Imports"
@@ -106,7 +108,7 @@ def validate_dealer(dealer_id: int):
     cursor = None
 
     try:
-        print(f"Connecting to {SERVER}/{DATABASE}...")
+        print_log(f"Connecting to {SERVER}/{DATABASE}...", Colors.CYAN)
         connection = pyodbc.connect(CONNECTION_STRING)
         cursor = connection.cursor()
 
@@ -118,13 +120,17 @@ def validate_dealer(dealer_id: int):
         matched_count = len(matched_ids)
         status = "MATCHED" if not missing_ids and source_count == matched_count else "MISMATCH"
 
-        print(
+        print_log(
             f"DealerId={dealer_id}: harley_used_bike records={source_count}, "
-            f"matched hubid records={matched_count}, status={status}"
+            f"matched hubid records={matched_count}, status={status}",
+            Colors.GREEN if status == "MATCHED" else Colors.RED,
         )
 
         if missing_ids:
-            print(f"Missing hubid values ({len(missing_ids)}): {sorted(missing_ids)}")
+            print_log(
+                f"Missing hubid values ({len(missing_ids)}): {sorted(missing_ids)}",
+                Colors.YELLOW,
+            )
 
         if status != "MATCHED":
             raise RuntimeError(
@@ -137,7 +143,7 @@ def validate_dealer(dealer_id: int):
             cursor.close()
         if connection is not None:
             connection.close()
-            print("Database connection closed.")
+            print_log("Database connection closed.", Colors.GRAY)
 
 
 def parse_arguments():
@@ -162,15 +168,21 @@ def main():
 
     if args.dealer_id is None:
         dealer_ids = read_dealer_ids(INPUT_FILE)
-        print(f"File mode: loaded {len(dealer_ids)} DealerId value(s) from {INPUT_FILE}.")
+        print_log(
+            f"File mode: loaded {len(dealer_ids)} DealerId value(s) from {INPUT_FILE}.",
+            Colors.BLUE,
+        )
     else:
         dealer_ids = [validate_dealer_id(args.dealer_id)]
-        print(f"Single-dealer mode: DealerId={dealer_ids[0]}.")
+        print_log(f"Single-dealer mode: DealerId={dealer_ids[0]}.", Colors.BLUE)
 
     for dealer_id in dealer_ids:
         validate_dealer(dealer_id)
 
-    print(f"Validation passed for {len(dealer_ids)} DealerId value(s).")
+    print_log(
+        f"Validation passed for {len(dealer_ids)} DealerId value(s).",
+        Colors.GREEN,
+    )
 
 
 if __name__ == "__main__":
