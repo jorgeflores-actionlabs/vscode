@@ -3,6 +3,54 @@ from pathlib import Path
 
 import pyodbc
 
+try:
+    from console_colors import (
+        Colors,
+        print_banner,
+        print_log,
+        print_metric,
+        print_status,
+    )
+except ModuleNotFoundError:
+    class Colors:
+        """Fallback colors when the reusable helper is not beside this script."""
+
+        RESET = "\033[0m"
+        RED = "\033[91m"
+        GREEN = "\033[92m"
+        YELLOW = "\033[93m"
+        BLUE = "\033[94m"
+        CYAN = "\033[96m"
+        GRAY = "\033[90m"
+        WHITE = "\033[97m"
+        BOLD = "\033[1m"
+
+    def print_log(message: str, color: str = Colors.RESET):
+        """Print a colored log message without requiring another local file."""
+        print(f"{color}{message}{Colors.RESET}")
+
+    def print_banner(title: str, subtitle: str = ""):
+        """Print a section banner without requiring another local file."""
+        line = "=" * 72
+        print_log(line, Colors.CYAN)
+        print_log(f"  {title}", f"{Colors.BOLD}{Colors.CYAN}")
+        if subtitle:
+            print_log(f"  {subtitle}", Colors.GRAY)
+        print_log(line, Colors.CYAN)
+
+    def print_metric(label: str, value, color: str = Colors.RESET):
+        """Print an aligned label/value pair."""
+        print_log(f"  {label:<28} {value}", color)
+
+    def print_status(status: str, details: str = ""):
+        """Print a prominently colored validation status."""
+        normalized_status = status.upper()
+        color = Colors.GREEN if normalized_status == "MATCHED" else Colors.RED
+        message = f"[ {normalized_status:^10} ]"
+        if details:
+            message = f"{message} {details}"
+        print_log(message, f"{Colors.BOLD}{color}")
+
 
 SERVER = "sqlag_pdxsql.external.pie.pdx.dealerspike.com"
 DATABASE = "DMS_Imports"
@@ -93,7 +141,7 @@ def validate_outputs(dealer_ids: list[int]):
     mismatches = []
 
     try:
-        print(f"Connecting to {SERVER}/{DATABASE}...")
+        print_log(f"  Connecting to {SERVER}/{DATABASE}...", Colors.CYAN)
         connection = pyodbc.connect(CONNECTION_STRING)
         cursor = connection.cursor()
 
@@ -105,12 +153,16 @@ def validate_outputs(dealer_ids: list[int]):
                 cursor, DEALER_FEED_COUNT_QUERY, (dealer_id,)
             )
 
-            print(
-                f"[{index}/{len(dealer_ids)}] DealerId={dealer_id}: "
-                f"DMS_Loading count={loading_count}, v4FeedCount={dealer_feed_count}"
+            status = "MATCHED" if loading_count == dealer_feed_count else "MISMATCH"
+            print_log(f"\nDealer {dealer_id} ({index}/{len(dealer_ids)})", f"{Colors.BOLD}{Colors.BLUE}")
+            print_metric("DMS_Loading count", loading_count)
+            print_metric("v4FeedCount", dealer_feed_count)
+            print_status(
+                status,
+                f"{loading_count} loading / {dealer_feed_count} feed",
             )
 
-            if loading_count != dealer_feed_count:
+            if status == "MISMATCH":
                 mismatches.append((dealer_id, loading_count, dealer_feed_count))
 
     finally:
@@ -118,7 +170,7 @@ def validate_outputs(dealer_ids: list[int]):
             cursor.close()
         if connection is not None:
             connection.close()
-            print("Database connection closed.")
+            print_log("  Database connection closed.", Colors.GRAY)
 
     if mismatches:
         details = "; ".join(
@@ -127,7 +179,10 @@ def validate_outputs(dealer_ids: list[int]):
         )
         raise RuntimeError(f"Validation failed. Output mismatch: {details}")
 
-    print(f"Validation passed for {len(dealer_ids)} DealerId value(s).")
+    print_banner(
+        "VALIDATION COMPLETE",
+        f"{len(dealer_ids)} DealerId value(s) passed successfully",
+    )
 
 
 def parse_arguments():
@@ -152,10 +207,14 @@ def main():
 
     if args.dealer_id is None:
         dealer_ids = read_dealer_ids(INPUT_FILE)
-        print(f"File mode: loaded {len(dealer_ids)} DealerId value(s) from {INPUT_FILE}.")
+        mode_description = (
+            f"File mode | {len(dealer_ids)} DealerId value(s) loaded from {INPUT_FILE}"
+        )
     else:
         dealer_ids = [validate_dealer_id(args.dealer_id)]
-        print(f"Single-dealer mode: DealerId={dealer_ids[0]}.")
+        mode_description = f"Single-dealer mode | DealerId={dealer_ids[0]}"
+
+    print_banner("DEALER OUTPUT VALIDATION", mode_description)
 
     validate_outputs(dealer_ids)
 
