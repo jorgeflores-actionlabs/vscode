@@ -20,7 +20,7 @@ HARLEY_USEDBIKE_QUERY = """
 SELECT DISTINCT harley_usedbike_id
 FROM [Harley].[dbo].[harley_used_bikes] WITH (NOLOCK)
 WHERE dealership_id = ?
-  AND Automotive = 1
+  AND Automaintained = 1
   AND deleted = 0;
 """
 
@@ -80,7 +80,7 @@ def read_dealer_ids(input_file: Path) -> list[int]:
 
 
 def fetch_harley_usedbike_ids(cursor, dealer_id: int) -> set[int]:
-    """Return active automotive Harley used-bike IDs for a dealer."""
+    """Return active auto-maintained Harley used-bike IDs for a dealer."""
     cursor.execute(HARLEY_USEDBIKE_QUERY, (dealer_id,))
     return {int(row[0]) for row in cursor.fetchall() if row[0] is not None}
 
