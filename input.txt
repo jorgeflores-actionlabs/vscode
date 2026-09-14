@@ -1,2 +1,2 @@
-3139|12781089-83c9-44ed-a0ec-dbd9e85a37f4|CDKLightspeed|JimmyJonesPolaris
-3168|a5d7686b-5671-4b10-bbc9-945b475b7d52|CDKLightspeed|KauaiMotorsports
+3182|24d93751-dfe9-4c8f-9663-5243ce25aadf|CDKLightspeed|DucatiNewportBeach
+3205|0912c431-ef2d-4000-9ec3-773fe0b4f0a6|CDKLightspeed|RockyMountainBoat
