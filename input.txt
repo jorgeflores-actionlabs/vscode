@@ -1,2 +1,5 @@
 3182|24d93751-dfe9-4c8f-9663-5243ce25aadf|CDKLightspeed|DucatiNewportBeach
 3205|0912c431-ef2d-4000-9ec3-773fe0b4f0a6|CDKLightspeed|RockyMountainBoat
+3230|f0916b50-a79f-4a1d-8154-7d269e5cd6a0|CDKLightspeed|RivaMiami
+3231|b863de7f-adcb-4d22-bc92-777a82c39530|CDKLightspeed|RivaMarineoftheKeys
+3343|6876e340-bb67-4c0d-9495-5a79c799dce9|CDKLightspeed|BigStCharlesMotorsports
