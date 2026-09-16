@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 import pyodbc
@@ -243,10 +244,16 @@ def main():
         mode_description = f"Single-dealer mode | DealerId={dealer_ids[0]}"
 
     print_banner("DUPLICATE UNIT-LINKING VALIDATION", mode_description)
-    validate_outputs(dealer_ids)
+    try:
+        validate_outputs(dealer_ids)
+    except RuntimeError as error:
+        print_log(f"Validation error: {error}", f"{Colors.BOLD}{Colors.RED}")
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":
     # File mode: python 6_ValidateDuplicateUnitLinking.py
     # Single-dealer mode: python 6_ValidateDuplicateUnitLinking.py 3563
-    main()
+    sys.exit(main())
