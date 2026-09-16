@@ -140,27 +140,38 @@ def fetch_duplicate_links(cursor, dealer_id: int) -> list[tuple]:
     return cursor.fetchall()
 
 
-def validate_dealer(cursor, dealer_id: int) -> list[tuple]:
+def validate_dealer(cursor, dealer_id: int) -> dict:
     """Validate that no duplicate unit-linking events exist for a dealer."""
     duplicate_rows = fetch_duplicate_links(cursor, dealer_id)
+    duplicate_groups = {}
+
+    for unit_id, hubid, event_count in duplicate_rows:
+        group = duplicate_groups.setdefault(
+            hubid,
+            {"unit_ids": set(), "event_count": event_count},
+        )
+        group["unit_ids"].add(unit_id)
 
     print_log(f"\nDealer {dealer_id}", f"{Colors.BOLD}{Colors.BLUE}")
-    print_metric("Duplicate groups", len(duplicate_rows))
+    print_metric("Duplicate hubid groups", len(duplicate_groups))
 
-    if not duplicate_rows:
+    if not duplicate_groups:
         print_status("SUCCESS", "no duplicate events found")
-        return []
+        return {}
 
-    print_status("ERROR", f"{len(duplicate_rows)} duplicate group(s) found")
-    print_log("  unitId                         hubid               events", Colors.YELLOW)
+    print_status("ERROR", f"{len(duplicate_groups)} duplicate hubid group(s) found")
+    print_log("  hubid                         events   [unitId]", Colors.YELLOW)
     print_log("  ----------------------------------------------------------------", Colors.YELLOW)
-    for unit_id, hubid, event_count in duplicate_rows:
+    for hubid in sorted(duplicate_groups, key=lambda value: str(value)):
+        group = duplicate_groups[hubid]
+        unit_ids = sorted(group["unit_ids"], key=lambda value: str(value))
+        unit_ids_text = ", ".join(str(unit_id) for unit_id in unit_ids)
         print_log(
-            f"  {str(unit_id):<30} {str(hubid):<19} {event_count}",
+            f"  {str(hubid):<30} {group['event_count']:<8} [{unit_ids_text}]",
             Colors.RED,
         )
 
-    return duplicate_rows
+    return duplicate_groups
 
 
 def validate_outputs(dealer_ids: list[int]):
@@ -175,9 +186,9 @@ def validate_outputs(dealer_ids: list[int]):
         cursor = connection.cursor()
 
         for dealer_id in dealer_ids:
-            duplicate_rows = validate_dealer(cursor, dealer_id)
-            if duplicate_rows:
-                errors[dealer_id] = duplicate_rows
+            duplicate_groups = validate_dealer(cursor, dealer_id)
+            if duplicate_groups:
+                errors[dealer_id] = duplicate_groups
     finally:
         if cursor is not None:
             cursor.close()
@@ -186,7 +197,7 @@ def validate_outputs(dealer_ids: list[int]):
             print_log("  Database connection closed.", Colors.GRAY)
 
     if errors:
-        total_groups = sum(len(rows) for rows in errors.values())
+        total_groups = sum(len(groups) for groups in errors.values())
         print_banner(
             "VALIDATION FAILED",
             f"{total_groups} duplicate group(s) require attention",
