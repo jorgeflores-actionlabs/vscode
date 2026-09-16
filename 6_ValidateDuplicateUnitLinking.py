@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pyodbc
 
-
 try:
     from console_colors import (
         Colors,
@@ -66,19 +65,26 @@ CONNECTION_STRING = (
 )
 
 DUPLICATE_UNIT_LINKING_QUERY = """
-SELECT unitId, hubid, COUNT(*) AS event_count
-FROM [Harley].[dbo].[SQS_Unit_Linking] WITH (NOLOCK)
-WHERE dealerId = ?
-  AND hubid IN (
-      SELECT harley_usedbike_id
-      FROM [Harley].[dbo].[harley_used_bikes] WITH (NOLOCK)
-      WHERE dealership_id = ?
-        AND Automaintained = 1
-        AND deleted = 0
-  )
-GROUP BY unitId, hubid
-HAVING COUNT(*) > 1
-ORDER BY hubid, unitId;
+WITH DuplicateHubids AS (
+    SELECT hubid, COUNT(*) AS event_count
+    FROM [Harley].[dbo].[SQS_Unit_Linking] WITH (NOLOCK)
+    WHERE dealerId = ?
+      AND hubid IN (
+          SELECT harley_usedbike_id
+          FROM [Harley].[dbo].[harley_used_bikes] WITH (NOLOCK)
+          WHERE dealership_id = ?
+            AND Automaintained = 1
+            AND deleted = 0
+      )
+    GROUP BY hubid
+    HAVING COUNT(*) > 1
+)
+SELECT DISTINCT linking.unitId, linking.hubid, duplicates.event_count
+FROM [Harley].[dbo].[SQS_Unit_Linking] AS linking WITH (NOLOCK)
+INNER JOIN DuplicateHubids AS duplicates
+    ON duplicates.hubid = linking.hubid
+WHERE linking.dealerId = ?
+ORDER BY linking.hubid, linking.unitId;
 """
 
 
@@ -127,7 +133,10 @@ def read_dealer_ids(input_file: Path) -> list[int]:
 
 def fetch_duplicate_links(cursor, dealer_id: int) -> list[tuple]:
     """Return duplicate unitId/hubid groups for one dealer."""
-    cursor.execute(DUPLICATE_UNIT_LINKING_QUERY, (dealer_id, dealer_id))
+    cursor.execute(
+        DUPLICATE_UNIT_LINKING_QUERY,
+        (dealer_id, dealer_id, dealer_id),
+    )
     return cursor.fetchall()
 
 
