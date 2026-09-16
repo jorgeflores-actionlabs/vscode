@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 import pyodbc
@@ -228,17 +229,22 @@ def main():
         mode_description,
     )
 
-    for dealer_id in dealer_ids:
-        print_log(f"\nDealer {dealer_id}", f"{Colors.BOLD}{Colors.BLUE}")
-        validate_dealer(dealer_id)
+    try:
+        for dealer_id in dealer_ids:
+            print_log(f"\nDealer {dealer_id}", f"{Colors.BOLD}{Colors.BLUE}")
+            validate_dealer(dealer_id)
+    except RuntimeError as error:
+        print_log(f"Validation error: {error}", f"{Colors.BOLD}{Colors.RED}")
+        return 1
 
     print_banner(
         "VALIDATION COMPLETE",
         f"{len(dealer_ids)} DealerId value(s) passed successfully",
     )
+    return 0
 
 
 if __name__ == "__main__":
     # File mode: python 5_ValidateHarleyUsedBike.py
     # Single-dealer mode: python 5_ValidateHarleyUsedBike.py 2379
-    main()
+    sys.exit(main())
