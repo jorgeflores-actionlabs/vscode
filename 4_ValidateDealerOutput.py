@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 import pyodbc
@@ -216,10 +217,16 @@ def main():
 
     print_banner("DEALER OUTPUT VALIDATION", mode_description)
 
-    validate_outputs(dealer_ids)
+    try:
+        validate_outputs(dealer_ids)
+    except RuntimeError as error:
+        print_log(f"Validation error: {error}", f"{Colors.BOLD}{Colors.RED}")
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":
     # File mode:          python 4_ValidateDealerOutput.py
     # Single-dealer mode: python 4_ValidateDealerOutput.py 1785
-    main()
+    sys.exit(main())
