@@ -1,1 +1,2 @@
-4849|8b1d6703-0974-43fc-83b2-2201adc5add4|CDKLightspeed|TexasPowersports
+4905|82d36369-23a3-4b5b-924e-4a5c5a57b855|CDKLightspeed|ChampionshipPowersports
+4916|665c592d-b516-4046-a9b3-0ae4caa1af28|CDKLightspeed|StamfordMotorsports
