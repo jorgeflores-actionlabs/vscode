@@ -1,2 +1,2 @@
-4905|82d36369-23a3-4b5b-924e-4a5c5a57b855|CDKLightspeed|ChampionshipPowersports
-4916|665c592d-b516-4046-a9b3-0ae4caa1af28|CDKLightspeed|StamfordMotorsports
+5006|9af877c3-5477-4f31-b34f-9d2b0c68a66f|CDKLightspeed|PowersportsPlusAmericus
+5058|ebb1eea4-282b-4702-9b6b-567700f20b21|CDKLightspeed|MidwestMotorsports
