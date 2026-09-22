@@ -1,6 +1,2 @@
-5132|9dbe09da-6b93-4612-9114-ac0ccde1c8d5|CDKLightspeed|GrandRapidsHarleyDavidson
-5180|90862a29-e101-4d8d-8c56-4addedd6246f|CDKLightspeed|BlueRidgePowersports
-5190|1843218e-c513-4f69-986b-a769c006df6b|CDKLightspeed|WilmingtonPowersports
-5200|ad3b3a87-159e-4379-a539-1aa733448183|CDKLightspeed|HondaNorthCarolina
-5221|3ee1affd-b9f6-4dca-8fc6-6af249874cea|CDKLightspeed|RomneyCycles
-5251|987301df-a9da-49cc-be3f-10688be6727b|CDKLightspeed|IndependentCounty
+5327|782543fa-e226-4d75-8c88-d5c243b8117c|CDKLightspeed|MositesMotorsports
+5416|4b56c3a4-6771-48ef-ac68-5770e3b6e799|CDKLightspeed|DeepCreekMarina
