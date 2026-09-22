@@ -99,13 +99,13 @@ def read_input_records(input_file: Path) -> list[tuple[int, str]]:
                 continue
 
             fields = [field.strip() for field in line.split("|")]
-            if len(fields) != 4:
+            if len(fields) not in {4, 5}:
                 raise ValueError(
-                    f"Line {line_number}: expected 4 fields separated by '|', "
+                    f"Line {line_number}: expected 4 or 5 fields separated by '|', "
                     f"but found {len(fields)}."
                 )
 
-            if not all(fields):
+            if not all(fields[:4]):
                 raise ValueError(f"Line {line_number}: one or more fields are empty.")
 
             dealer_id = validate_dealer_id(

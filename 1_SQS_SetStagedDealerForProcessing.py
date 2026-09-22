@@ -7,8 +7,9 @@ SERVER = "sqlag_pdxsql.external.pie.pdx.dealerspike.com"
 DATABASE = "DMS_Imports"
 INPUT_FILE = Path(__file__).with_name("input.txt")
 
-# input.txt contains four columns separated by "|":
+# input.txt contains four required columns separated by "|":
 # DealerId | S3ProfileFolder | FTPProfileFolder | DealerFolderName
+# A fifth value may be present for display/context and is ignored here.
 # The stored procedure requires a fifth parameter that is not included in the file.
 # Use 0 for @S3GuidLookup, as in the original example.
 DEFAULT_S3_GUID_LOOKUP = 0
@@ -42,14 +43,14 @@ def read_input(input_file: Path):
                 continue
 
             fields = [field.strip() for field in line.split("|")]
-            if len(fields) != 4:
+            if len(fields) not in {4, 5}:
                 raise ValueError(
-                    f"Line {line_number}: expected 4 fields separated by '|', "
+                    f"Line {line_number}: expected 4 or 5 fields separated by '|', "
                     f"but found {len(fields)}."
                 )
 
-            dealer_id_text, s3_profile, ftp_profile, dealer_folder = fields
-            if not all(fields):
+            dealer_id_text, s3_profile, ftp_profile, dealer_folder = fields[:4]
+            if not all(fields[:4]):
                 raise ValueError(f"Line {line_number}: one or more fields are empty.")
 
             try:
