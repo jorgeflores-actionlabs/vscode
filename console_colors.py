@@ -38,7 +38,8 @@ def print_metric(label: str, value, color: str = Colors.RESET):
 def print_status(status: str, details: str = ""):
     """Print a prominently colored validation status."""
     normalized_status = status.upper()
-    color = Colors.GREEN if normalized_status == "MATCHED" else Colors.RED
+    successful_statuses = {"MATCHED", "SUCCESS", "PASSED"}
+    color = Colors.GREEN if normalized_status in successful_statuses else Colors.RED
     message = f"[ {normalized_status:^10} ]"
     if details:
         message = f"{message} {details}"
