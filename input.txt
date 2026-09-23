@@ -1,2 +1,6 @@
-7723|dd987c8b-ea49-4584-84a4-b8be4f7bbe14|CDKLightspeed|EdsBoats|edsboats
-7773|7ebd0979-92fe-4108-a1f1-e4a039f90cd6|CDKLightspeed|IslandPowersports|islandpowersports
+7781|80e72071-4517-4c3d-a830-70612c7e85fc|CDKLightspeed|BeckleyHonda|beckleyhonda
+7794|b5fe5a96-6139-43ea-b4d8-b1ddb4fbbbca|CDKLightspeed|lowcountryharley|lowcountryharley
+7824|73d0868d-b0ce-4638-a94b-f5f982fb4131|CDKLightspeed|FRSPowersports|FRSPowersports
+7860|0c972c65-f813-43fe-b44b-0e7c720a2fb8|CDKLightspeed|KirkBrothersPowersports|kirkbrotherspowersports
+8173|0e79b3d8-c334-48cc-9a50-c126fe778c53|CDKLightspeed|hattiesburgcycles|hattiesburgcycles
+8212|ce665bd8-32c5-44b0-b2b5-476534eb1583|CDKLightspeed|RivaSuperstore|rivasuperstore
