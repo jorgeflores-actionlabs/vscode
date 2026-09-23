@@ -1,7 +1,2 @@
-5327|782543fa-e226-4d75-8c88-d5c243b8117c|CDKLightspeed|MositesMotorsports
-7447|ce0165b3-2cbe-4507-a053-711196fa43e7|CDKLightspeed|ElectricCartCompany|electriccartcompany
-7504|bac19ddf-59f4-479b-a188-960ca3618050|CDKLightspeed|DallasHonda|dallashonda
-7539|c0db9d40-37e1-4bcd-8355-c2b5c673bd32|CDKLightspeed|IslandWatersports|ocmdboats
-7607|da30a288-d5c1-4ac6-8d17-abc12ab2c14b|CDKLightspeed|Ride1Powersports|ride1powersportsspringfield
-7655|c2162189-d35a-4ea2-b598-dc3b48dfbe81|CDKLightspeed|CoastlineMarine|CoastlineMarine
-7718|a8f3e2c1-9d4b-5e6f-a7b8-c9d0e1f2a3b4|CDKLightspeed|PrimeMotorsports|primepsutah
+7723|dd987c8b-ea49-4584-84a4-b8be4f7bbe14|CDKLightspeed|EdsBoats|edsboats
+7773|7ebd0979-92fe-4108-a1f1-e4a039f90cd6|CDKLightspeed|IslandPowersports|islandpowersports
