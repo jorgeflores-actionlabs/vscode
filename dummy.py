@@ -1,3 +1,5 @@
+import argparse
+
 import pyodbc
 
 
@@ -34,8 +36,25 @@ def print_rows(cursor) -> None:
         print(" | ".join("" if value is None else str(value) for value in row))
 
 
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Dummy read-only SQL script for API runner testing."
+    )
+    parser.add_argument(
+        "dummy_param",
+        nargs="?",
+        default="",
+        help="Optional no-impact positional parameter used only for logging.",
+    )
+    return parser.parse_args()
+
+
 def main() -> int:
+    args = parse_arguments()
+
     print(f"Connecting to {SERVER}/{DATABASE}...")
+    if args.dummy_param:
+        print(f"Dummy parameter received: {args.dummy_param}")
     print("Executing dummy read-only query...")
 
     with pyodbc.connect(CONNECTION_STRING) as connection:
