@@ -1,2 +1,8 @@
 10404|33c16e15-d331-4a1e-abd3-3a4610f4081f|CDKLightspeed|wildhorsekawasaki|wildhorsehd
 10454|1f91fd0e-f267-46a1-a0c4-fb4b60c84ce8|CDKLightspeed|FirstChoiceCanam|FirstChoiceCanam
+10509|1f1fb5cc-ca00-4ec5-b93c-9af531ef914a|CDKLightspeed|SuperbikesShowroom|superbikeshowroom
+10514|ed231de7-5059-432e-ac98-8097ff17df54|CDKLightspeed|SouthSoundScooters|southsoundscooters
+10516|bd57352e-babb-4411-b33c-556a80e7147d|CDKLightspeed|HDofScottsdale|hdofscottsdale
+10518|1748e3dd-9591-47d6-8a87-898b4a1b42f0|CDKLightspeed|LovePowerEquipment|LovePowerEquipment
+10571|a18308d8-0b73-443d-a4ba-e66aa6f84f20|CDKLightspeed|BirdsOfPreyMotorsports|BirdsOfPreyMotorsports
+10626|92e43b3f-c142-458d-92da-e5760030eed5|CDKLightspeed|MotohousePicayune|MotohousePicayune
