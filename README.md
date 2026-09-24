@@ -69,6 +69,35 @@ ACTIONS = {
 
 Las acciones desconocidas se registran como warning y no detienen el worker.
 
+## Mapping de comandos
+
+`command_mapping.py` define el mapping por `action` y turno (`run`).
+
+Actualmente no hay comandos predefinidos. La estructura queda lista para agregar
+comandos despues:
+
+```python
+COMMAND_MAPPING = {
+    "schedule": {
+        "night": [],
+        "afternoon": [],
+    },
+}
+```
+
+Cada comando puede aceptar parametros fijos o placeholders del payload:
+
+```python
+{
+    "script": APP_DIR / "mi_script.py",
+    "args": ["--dealer-id", "{dealerId}", "--run", "{run}"],
+    "cwd": APP_DIR,
+}
+```
+
+Placeholders soportados: `{run}`, `{action}`, `{version}`, `{updatedAt}` y
+cualquier llave simple que venga en el JSON de la API.
+
 ## Configuración
 
 En `config.py` puedes cambiar:
@@ -77,4 +106,6 @@ En `config.py` puedes cambiar:
 - `POLL_INTERVAL_SECONDS`
 - timeout HTTP
 
-Por defecto consulta ambas APIs cada 30 segundos.
+Por defecto consulta ambas APIs cada 5 segundos. El worker compara `action`,
+`version` y `updatedAt`; si no cambiaron, registra `SIN_CAMBIOS` y no vuelve a
+ejecutar la accion.

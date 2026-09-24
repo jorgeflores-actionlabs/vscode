@@ -4,7 +4,7 @@ API_ENDPOINTS = {
 }
 
 # Intervalo de consulta en segundos.
-POLL_INTERVAL_SECONDS = 30
+POLL_INTERVAL_SECONDS = 5
 
 REQUEST_TIMEOUT_SECONDS = 15
 PID_FILE = ".api_runner.pid"
