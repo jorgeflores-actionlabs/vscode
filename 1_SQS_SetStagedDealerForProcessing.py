@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 import pyodbc
@@ -32,6 +33,37 @@ EXEC [dbo].[SQS_SetStagedDealerForProcessing]
 """
 
 
+def validate_dealer_id(value: str, source: str = "DealerId") -> int:
+    try:
+        dealer_id = int(value)
+    except ValueError as error:
+        raise ValueError(f"{source} must be an integer.") from error
+
+    if dealer_id <= 0:
+        raise ValueError(f"{source} must be a positive integer.")
+
+    return dealer_id
+
+
+def build_record(
+    dealer_id: int,
+    s3_profile: str,
+    ftp_profile: str,
+    dealer_folder: str,
+    s3_guid_lookup: int = DEFAULT_S3_GUID_LOOKUP,
+):
+    if not all([s3_profile, ftp_profile, dealer_folder]):
+        raise ValueError("S3ProfileFolder, FTPProfileFolder, and DealerFolderName are required.")
+
+    return (
+        dealer_id,
+        ftp_profile,
+        s3_profile,
+        dealer_folder,
+        s3_guid_lookup,
+    )
+
+
 def read_input(input_file: Path):
     """Read and validate the records that will be sent to the stored procedure."""
     records = []
@@ -53,20 +85,12 @@ def read_input(input_file: Path):
             if not all(fields[:4]):
                 raise ValueError(f"Line {line_number}: one or more fields are empty.")
 
-            try:
-                dealer_id = int(dealer_id_text)
-            except ValueError as error:
-                raise ValueError(
-                    f"Line {line_number}: DealerId must be an integer."
-                ) from error
-
             records.append(
-                (
-                    dealer_id,
-                    ftp_profile,
+                build_record(
+                    validate_dealer_id(dealer_id_text, f"Line {line_number} DealerId"),
                     s3_profile,
+                    ftp_profile,
                     dealer_folder,
-                    DEFAULT_S3_GUID_LOOKUP,
                 )
             )
 
@@ -74,6 +98,13 @@ def read_input(input_file: Path):
         raise ValueError(f"The file {input_file} contains no records.")
 
     return records
+
+
+def filter_records_by_dealer_id(records, dealer_id: int):
+    matching_records = [record for record in records if record[0] == dealer_id]
+    if not matching_records:
+        raise ValueError(f"DealerId {dealer_id} was not found in {INPUT_FILE}.")
+    return matching_records
 
 
 def consume_results(cursor):
@@ -87,9 +118,8 @@ def consume_results(cursor):
             break
 
 
-def execute_stored_procedures(input_file: Path = INPUT_FILE):
-    """Execute the stored procedure once for each valid input.txt record."""
-    records = read_input(input_file)
+def execute_stored_procedures(records):
+    """Execute the stored procedure once for each validated record."""
     connection = None
     cursor = None
 
@@ -120,6 +150,38 @@ def execute_stored_procedures(input_file: Path = INPUT_FILE):
             print("Database connection closed.")
 
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description=(
+            "Execute SQS_SetStagedDealerForProcessing. Without parameters, records "
+            "are read from input.txt."
+        )
+    )
+    parser.add_argument(
+        "dealer_id",
+        nargs="?",
+        help="Optional DealerId. When provided, the matching record is read from input.txt.",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = parse_arguments()
+
+    if args.dealer_id is None:
+        records = read_input(INPUT_FILE)
+        print(f"File mode: loaded {len(records)} record(s) from {INPUT_FILE}.")
+    else:
+        dealer_id = validate_dealer_id(args.dealer_id)
+        records = filter_records_by_dealer_id(read_input(INPUT_FILE), dealer_id)
+        print(f"Single-dealer mode: DealerId={records[0][0]}.")
+
+    execute_stored_procedures(records)
+
+
 if __name__ == "__main__":
-    # Run manually with: python sqlserver_connection.py
-    execute_stored_procedures()
+    # File mode:
+    #   python 1_SQS_SetStagedDealerForProcessing.py
+    # Single-dealer mode:
+    #   python 1_SQS_SetStagedDealerForProcessing.py 5221
+    main()
