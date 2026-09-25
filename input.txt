@@ -6,3 +6,4 @@
 10518|1748e3dd-9591-47d6-8a87-898b4a1b42f0|CDKLightspeed|LovePowerEquipment|LovePowerEquipment
 10571|a18308d8-0b73-443d-a4ba-e66aa6f84f20|CDKLightspeed|BirdsOfPreyMotorsports|BirdsOfPreyMotorsports
 10626|92e43b3f-c142-458d-92da-e5760030eed5|CDKLightspeed|MotohousePicayune|MotohousePicayune
+5006|9af877c3-5477-4f31-b34f-9d2b0c68a66f|CDKLightspeed|PowersportsPlusAmericus|PowersportsPlusAmericus
