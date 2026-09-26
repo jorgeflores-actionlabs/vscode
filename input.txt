@@ -6,8 +6,36 @@
 10518|1748e3dd-9591-47d6-8a87-898b4a1b42f0|CDKLightspeed|LovePowerEquipment|LovePowerEquipment
 10571|a18308d8-0b73-443d-a4ba-e66aa6f84f20|CDKLightspeed|BirdsOfPreyMotorsports|BirdsOfPreyMotorsports
 10626|92e43b3f-c142-458d-92da-e5760030eed5|CDKLightspeed|MotohousePicayune|MotohousePicayune
+
 2649|a16f115c-faf8-4a1f-b758-c2d7a1fcff75|CDKLightspeed|WaylenBayMarine|WaylenBayMarine
 2953|e8832823-8ab2-4f4b-a0e6-87a6862085d6|CDKLightspeed|BobLanpheresBeaverton|BobLanpheresBeaverton
 3230|f0916b50-a79f-4a1d-8154-7d269e5cd6a0|CDKLightspeed|RivaMiami|rivamiami
 3231|b863de7f-adcb-4d22-bc92-777a82c39530|CDKLightspeed|RivaMarineoftheKeys|rivamm
-/SpinCar/BeavertonMotorcyclesPowersports
+
+DECLARE @DID AS VARCHAR(25)
+SET @DID =  
+ 
+--DMS Config
+SELECT *
+FROM dms_Imports.dbo.dms_Config WITH (nolock)
+where dealerid = @DID
+ 
+--ARI Config
+SELECT *
+FROM ari_Imports.dbo.ari_Config WITH (nolock)
+where dealerid = @DID
+ 
+--SQS Config DMS 2.0
+SELECT *
+FROM dms_Imports.[dbo].[SQS_Dealer_Config] WITH (nolock)
+where dealerid = @DID
+ 
+--v6/v7 dealer info
+select *
+from Harley.dbo.dealers with (nolock)
+where did = @DID
+ 
+--active v6/v7 dealer
+select *
+from Harley.dbo.Site_Config with (nolock)
+where dealerid = @DID
