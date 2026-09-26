@@ -1,5 +1,7 @@
 import argparse
 import json
+import os
+import re
 import sys
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -61,7 +63,13 @@ DATABASE = "DMS_Imports"
 INPUT_FILE = Path(__file__).with_name("input.txt")
 WEBHOOK_URL = "https://dova.cloudata.solutions/lv/webhook/qa_count"
 INVENTORY_PATH = "/useradmin.asp?page=xinv-grid"
+DMS_ADMIN_DASHBOARD_URL = "https://dms-admin-app.services.dealerspike.net/Dashboard"
+CHROME_PROFILE_EMAIL = "jorge.flores@cloudata.pe"
+CHROME_USER_DATA_DIR = (
+    Path(os.environ.get("LOCALAPPDATA", "")) / "Google" / "Chrome" / "User Data"
+)
 REQUEST_TIMEOUT_SECONDS = 30
+PAGE_TIMEOUT_MILLISECONDS = 30_000
 
 CONNECTION_STRING = (
     "Driver={ODBC Driver 18 for SQL Server};"
@@ -204,36 +212,164 @@ def validate_count_value(result: dict, dealer_id: int) -> int:
     return int(count)
 
 
-def validate_dealer(cursor, dealer_id: int) -> int:
-    """Fetch the hostname, call the webhook, and return the numeric count."""
+def find_chrome_profile_directory() -> str:
+    """Find the local Chrome profile directory for the requested email."""
+    local_state_path = CHROME_USER_DATA_DIR / "Local State"
+    if not local_state_path.exists():
+        raise RuntimeError(f"Chrome Local State was not found: {local_state_path}")
+
+    try:
+        local_state = json.loads(local_state_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"Unable to read Chrome profile information: {error}") from None
+
+    profile_cache = local_state.get("profile", {}).get("info_cache", {})
+    for directory, profile in profile_cache.items():
+        email = str(profile.get("user_name", "")).strip().casefold()
+        if email == CHROME_PROFILE_EMAIL.casefold():
+            return directory
+
+    raise RuntimeError(
+        f"Chrome profile for {CHROME_PROFILE_EMAIL} was not found in {local_state_path}."
+    )
+
+
+def launch_dms_admin_browser():
+    """Open DMS Admin using the Chrome profile authenticated for the account."""
+    try:
+        from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        raise RuntimeError(
+            "Playwright is not installed. Install it with: python -m pip install playwright"
+        ) from None
+
+    profile_directory = find_chrome_profile_directory()
+    playwright = sync_playwright().start()
+
+    try:
+        context = playwright.chromium.launch_persistent_context(
+            user_data_dir=str(CHROME_USER_DATA_DIR),
+            channel="chrome",
+            headless=False,
+            timeout=PAGE_TIMEOUT_MILLISECONDS,
+            args=[f"--profile-directory={profile_directory}"],
+        )
+    except Exception as error:
+        playwright.stop()
+        message = str(error)
+        if "already running" in message.casefold() or "lock" in message.casefold():
+            raise RuntimeError(
+                f"Chrome profile {profile_directory} is already in use. "
+                "Close Chrome windows using the DMS Admin profile and try again."
+            ) from None
+        raise RuntimeError(f"Unable to open Chrome profile {profile_directory}: {error}") from None
+
+    return playwright, context, PlaywrightTimeoutError
+
+
+def get_browser_page(context):
+    """Return an existing page or create one in the persistent browser context."""
+    if context.pages:
+        return context.pages[0]
+    return context.new_page()
+
+
+def find_profile_row(page, dealer_id: int):
+    """Find exactly one dashboard row containing the requested Customer Id(s)."""
+    dealer_text = str(dealer_id)
+    rows = page.locator("tbody tr").filter(has_text=re.compile(rf"\b{re.escape(dealer_text)}\b"))
+    if rows.count() != 1:
+        raise RuntimeError(
+            f"Expected one DMS Admin profile for DealerId={dealer_id}, "
+            f"but found {rows.count()}."
+        )
+    return rows.first
+
+
+def fetch_dms_admin_count(page, dealer_id: int, timeout_error) -> int:
+    """Search DMS Admin, open Report, and read TOTAL INCLUDED UNITS."""
+    page.goto(DMS_ADMIN_DASHBOARD_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MILLISECONDS)
+
+    search = page.locator("input[placeholder*='Search for profiles']").first
+    search.wait_for(state="visible", timeout=PAGE_TIMEOUT_MILLISECONDS)
+    search.fill(str(dealer_id))
+    page.wait_for_timeout(750)
+
+    row = find_profile_row(page, dealer_id)
+    row.click()
+    page.wait_for_load_state("domcontentloaded", timeout=PAGE_TIMEOUT_MILLISECONDS)
+
+    report_tab = page.get_by_text("Report", exact=True).first
+    report_tab.wait_for(state="visible", timeout=PAGE_TIMEOUT_MILLISECONDS)
+    report_tab.click()
+
+    included_units_label = page.get_by_text("TOTAL INCLUDED UNITS", exact=True).first
+    included_units_label.wait_for(state="visible", timeout=PAGE_TIMEOUT_MILLISECONDS)
+
+    for level in range(1, 7):
+        ancestor = included_units_label.locator("xpath=" + "/.." * level)
+        text = ancestor.inner_text(timeout=PAGE_TIMEOUT_MILLISECONDS)
+        numbers = re.findall(r"(?<![\w])\d+(?![\w])", text)
+        if numbers:
+            return int(numbers[0])
+
+    raise RuntimeError(
+        f"TOTAL INCLUDED UNITS did not contain a numeric value for DealerId={dealer_id}."
+    )
+
+
+def validate_dealer(cursor, page, dealer_id: int, timeout_error) -> int:
+    """Compare the QA webhook count with the DMS Admin Report count."""
     hostname = fetch_hostname(cursor, dealer_id)
     inventory_url = build_inventory_url(hostname)
     result = post_count_request(dealer_id, inventory_url)
-    count = validate_count_value(result, dealer_id)
+    webhook_count = validate_count_value(result, dealer_id)
+    dms_admin_count = fetch_dms_admin_count(page, dealer_id, timeout_error)
+    matched = webhook_count == dms_admin_count
 
     print_log(f"\nDealer {dealer_id}", f"{Colors.BOLD}{Colors.BLUE}")
     print_metric("Hostname", hostname, Colors.WHITE)
     print_metric("Inventory URL", inventory_url, Colors.GRAY)
-    print_metric("Webhook", WEBHOOK_URL, Colors.GRAY)
-    print_metric("Count", count, Colors.WHITE)
-    print_status("PASSED", "numeric count received")
-    return count
+    comparison_color = f"{Colors.BOLD}{Colors.GREEN}" if matched else Colors.RED
+    print_metric("QA webhook count", webhook_count, comparison_color)
+    print_metric("DMS Admin count", dms_admin_count, comparison_color)
+    print_status(
+        "MATCHED" if matched else "NOT MATCHED",
+        "counts are equal" if matched else "counts are different",
+    )
+
+    if not matched:
+        raise RuntimeError(
+            f"Count mismatch for DealerId={dealer_id}: "
+            f"QA webhook={webhook_count}, DMS Admin={dms_admin_count}."
+        )
+
+    return webhook_count
 
 
 def validate_outputs(dealer_ids: list[int]):
     """Validate all requested dealers and display their numeric counts."""
     connection = None
     cursor = None
+    playwright = None
+    browser_context = None
     results = {}
 
     try:
         print_log(f"  Connecting to {SERVER}/{DATABASE}...", Colors.CYAN)
         connection = pyodbc.connect(CONNECTION_STRING)
         cursor = connection.cursor()
+        playwright, browser_context, timeout_error = launch_dms_admin_browser()
+        page = get_browser_page(browser_context)
 
         for dealer_id in dealer_ids:
-            results[dealer_id] = validate_dealer(cursor, dealer_id)
+            results[dealer_id] = validate_dealer(cursor, page, dealer_id, timeout_error)
     finally:
+        if browser_context is not None:
+            browser_context.close()
+        if playwright is not None:
+            playwright.stop()
         if cursor is not None:
             cursor.close()
         if connection is not None:
