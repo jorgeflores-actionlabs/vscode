@@ -92,7 +92,7 @@ def validate_dealer_id(value: str, source: str = "DealerId") -> int:
 
 
 def read_dealer_ids(input_file: Path) -> list[int]:
-    """Read DealerId values from the first section of input.txt."""
+    """Read one DealerId per line, optionally followed by legacy pipe fields."""
     dealer_ids = []
 
     with input_file.open(encoding="utf-8-sig") as file:
@@ -101,18 +101,12 @@ def read_dealer_ids(input_file: Path) -> list[int]:
             if not line:
                 continue
 
-            fields = [field.strip() for field in line.split("|")]
-            if len(fields) != 4:
-                raise ValueError(
-                    f"Line {line_number}: expected 4 fields separated by '|', "
-                    f"but found {len(fields)}."
-                )
-
-            if not all(fields):
-                raise ValueError(f"Line {line_number}: one or more fields are empty.")
-
+            dealer_id_value = line.split("|", maxsplit=1)[0].strip()
             dealer_ids.append(
-                validate_dealer_id(fields[0], source=f"Line {line_number}: DealerId")
+                validate_dealer_id(
+                    dealer_id_value,
+                    source=f"Line {line_number}: DealerId",
+                )
             )
 
     if not dealer_ids:
@@ -273,7 +267,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser(
         description=(
             "Compare COUNT and DMS webhook counts. "
-            "Without a DealerId, values are read from input.txt."
+            "Without a DealerId, one DealerId per line is read from input.txt; "
+            "legacy pipe-delimited lines are also accepted."
         )
     )
     parser.add_argument(
@@ -308,6 +303,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # File mode: python 7_ValidateDealerQaCount.py
+    # File mode (one DealerId per line): python 7_ValidateDealerQaCount.py
     # Single-dealer mode: python 7_ValidateDealerQaCount.py 7781
     sys.exit(main())
