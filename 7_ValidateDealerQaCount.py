@@ -236,11 +236,12 @@ def validate_dealer(cursor, dealer_id: int) -> tuple[int, int]:
     return count_value, dms_value
 
 
-def validate_outputs(dealer_ids: list[int]):
-    """Validate both webhook actions for all requested dealers."""
+def validate_outputs(dealer_ids: list[int]) -> bool:
+    """Validate every dealer, continuing after dealer-specific failures."""
     connection = None
     cursor = None
-    results = {}
+    passed_dealer_ids = []
+    failed_dealers = []
 
     try:
         print_log(f"  Connecting to {SERVER}/{DATABASE}...", Colors.CYAN)
@@ -248,7 +249,14 @@ def validate_outputs(dealer_ids: list[int]):
         cursor = connection.cursor()
 
         for dealer_id in dealer_ids:
-            results[dealer_id] = validate_dealer(cursor, dealer_id)
+            try:
+                validate_dealer(cursor, dealer_id)
+            except Exception as error:
+                failed_dealers.append((dealer_id, str(error)))
+                print_status("FAILED", f"DealerId={dealer_id}: {error}")
+                continue
+
+            passed_dealer_ids.append(dealer_id)
     finally:
         if cursor is not None:
             cursor.close()
@@ -258,8 +266,19 @@ def validate_outputs(dealer_ids: list[int]):
 
     print_banner(
         "VALIDATION COMPLETE",
-        f"{len(results)} DealerId value(s) passed successfully",
+        (
+            f"{len(passed_dealer_ids)} passed | "
+            f"{len(failed_dealers)} failed | {len(dealer_ids)} total"
+        ),
     )
+
+    if failed_dealers:
+        print_log("Failed DealerIds:", f"{Colors.BOLD}{Colors.RED}")
+        for dealer_id, error_message in failed_dealers:
+            print_log(f"  {dealer_id}: {error_message}", Colors.RED)
+        return False
+
+    return True
 
 
 def parse_arguments():
@@ -294,7 +313,9 @@ def main():
             mode_description = f"Single-dealer mode | DealerId={dealer_ids[0]}"
 
         print_banner("DEALER QA COUNT VALIDATION", mode_description)
-        validate_outputs(dealer_ids)
+        all_dealers_passed = validate_outputs(dealer_ids)
+        if not all_dealers_passed:
+            return 1
     except Exception as error:
         print_log(f"Validation error: {error}", f"{Colors.BOLD}{Colors.RED}")
         return 1
