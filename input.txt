@@ -12,3 +12,4 @@
 3230|f0916b50-a79f-4a1d-8154-7d269e5cd6a0|CDKLightspeed|RivaMiami|rivamiami
 3231|b863de7f-adcb-4d22-bc92-777a82c39530|CDKLightspeed|RivaMarineoftheKeys|rivamm
 2649|a16f115c-faf8-4a1f-b758-c2d7a1fcff75|Winboats|WaylenBayMarine|WaylenBayMarine
+10690|8c67997a-9745-40fb-a609-22e9431655c5|CDKLightspeed|JaysPowerCenter|jayspowercenter
