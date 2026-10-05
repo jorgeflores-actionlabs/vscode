@@ -1,2 +1,4 @@
 1644|8091b875-132b-4d38-a00c-53dc32153091|CDKLightspeed|shoedersMarine|shoedersmarine
 8072|5220c14c-8e10-4f7c-93e8-0b722780a657|CDKLightspeed|EuroVegas|eurocyclelasvegas
+11410|0fe508e4-966c-4e92-a4b1-d78ae3267ac2|CDKLightspeed|JohnnyKsBedfordHeights|JohnnyKsPowerSports
+4859|41b899da-71ea-4b35-80f3-7e7e78a39135|CDKLightspeed|DonsPowersports|donskawasaki
