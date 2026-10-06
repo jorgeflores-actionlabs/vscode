@@ -4,3 +4,5 @@
 4859|41b899da-71ea-4b35-80f3-7e7e78a39135|CDKLightspeed|DonsPowersports|donskawasaki
 7354|2b57a3be-3364-47bc-b700-4237aa11b14a|CDKLightspeed|WestVirginiaMotorsports|westvirginiamotorsports
 7403|324244f1-2ef8-4bbf-90ad-b8363a79a1e6|CDKLightspeed|EliffMotors|eliffpolaris
+7590|6ee3d35c-1bd6-4e98-90c7-1b0f5a9f47e5|CDKLightspeed|EliffMotors|elifftrailers
+8127|ab91fde9-617a-4c0d-bddf-7d5960d4e274|CDKLightspeed|CrownPowersports|maxscycle
