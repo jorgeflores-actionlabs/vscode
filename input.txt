@@ -1,3 +1,2 @@
-7622|e2acb970-2b11-4b29-a3d1-d94cf4e8f8b4|CDKLightspeed|LakeVikingMarine|LakeVikingMarine
-7772|96b05fc8-8087-4856-a6a2-5ab1c9c259bc|CDKLightspeed|MotorcycleMallOfMonmouth|MotorcycleMallOfMonmouth
-10562|2a2d0c21-6b4c-44f4-ba5a-b68805ea0f31|CDKLightspeed|RideDMS|ridedms
+362|860c0975-13bd-4a0b-9a3b-334be1e78431|Nizex|JoesCycleShop|joes-cycleshop
+711|50fd1e4c-a21b-42ca-a387-ddf16cd7d4fd|Nizex|ClintonCountyMotorsports|clintoncountymotorsports
