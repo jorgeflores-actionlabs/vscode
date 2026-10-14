@@ -1,6 +1,4 @@
-789|1fab9d22-1a9c-4d78-95b9-02c18e885d6e|Nizex|Lansford|lansfordkawasaki
-2646|39f9126d-ab1b-4099-9425-284303fb49ea|Nizex|hondacrofton|hondacrofton
-3997|0092d4da-e8ab-493b-936a-1297e795ed90|Nizex|MontanaPowerProducts|MontanaPowerProducts
-^SpinCar/MontanaPowerProducts/
-4452|67fa76af-f732-42eb-8d3d-e849effc1dff|Nizex|HondaYamahaRedlands|hyredlands
-4619|26b08eaa-4a86-404b-b764-63eaa4a89c87|Nizex|MotoRichmond|motorichmond
+11042|d837f831-06b8-44bc-8e07-c31995cfd506|Blackpurl|EarlyTrailerSales|earlytrailersales
+12225|8fc009e6-8009-444b-8ff4-30f9508525d4|Blackpurl|TexstarEquipment|TexstarEquipment
+10614|0949232f-00ab-4e01-bdac-e7bbf8e53e50|Talon|HDofValparaiso|hdvalpo
+10630|45177e1c-0ec0-400d-9bb2-8419122d2187|Talon|BattlefieldHD|battlefieldharley-davidson
