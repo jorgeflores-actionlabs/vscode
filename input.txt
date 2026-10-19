@@ -1,4 +1,9 @@
-11042|d837f831-06b8-44bc-8e07-c31995cfd506|Blackpurl|EarlyTrailerSales|earlytrailersales
-12225|8fc009e6-8009-444b-8ff4-30f9508525d4|Blackpurl|TexstarEquipment|TexstarEquipment
-10614|0949232f-00ab-4e01-bdac-e7bbf8e53e50|Talon|HDofValparaiso|hdvalpo
-10630|45177e1c-0ec0-400d-9bb2-8419122d2187|Talon|BattlefieldHD|battlefieldharley-davidson
+7815|e65bba5f-0c36-4e9b-9b01-ba58bfc8b6a4|Talon|JimMoroneysInc|fasthog
+8159|74f2a9e6-b0d2-4d0a-890d-e16a30047002|Talon|QueenCityHD|queencityhd
+8160|d46b78c9-0919-43b0-8d63-7c40754f9c32|Talon|hdofdc|HDofDC
+10491|d6c39546-6bd9-4d6e-b2cf-b777f5a9c7f4|Talon|DSHD|dsharley
+10675|762ef655-ad0a-46c3-b282-7a69dfd29ebd|Talon|BertsBarracuda|bertsbarracuda
+10676|f44c0bd4-5c64-43d4-aaf9-cddab36a0771|Talon|BertsBlackWidowHD|bertsblackwidow
+11051|66833d74-7c7a-4001-9bc7-552e532d46c8|Talon|NorthwestHD|nwharley
+11319|7947f0fd-6119-4760-95d1-c54bea78ce13|Talon|RenegadeHD|RenegadeHD
+11405|54cc3f01-e322-4d98-8160-9367ca4e976a|Talon|EmeraldCoastHD|EmeraldCoastHD
