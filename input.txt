@@ -1,5 +1,6 @@
-3683|5fe9fe22-db96-4c56-b384-3f44f64d4a1e|systems2000|Lees|leespowersports
-7925|c3d15a44-7305-425c-a7ea-b3616c3aaae2|FeedImporter|UglyJohns|UglyJohns
-10019|95d4f44e-a068-433f-8b20-f6b7df035bba|FeedImporter|CrockersBoatYard|CrockersBoatYard
-10357|61545b26-30ad-432a-a484-5201abdd930c|FeedImporter|FtMyersMarine|FtMyersMarine
-12407|d0a5c480-7bb7-4389-a1aa-3a1480dad412|FeedImporter|BoatingAtlanta|BoatingAtlanta
+4527|10d11f2c-0981-43cc-a340-c819e561b8e9|WGet\MachineFinder|DeerCountry|deercountry
+4620|725cea91-a291-44a0-8619-101db914c72d|WGet\MachineFinder|EnnsBrothers|EnnsBrothers
+8163|8b1e5296-2a29-4c0f-bcd4-3e7030bf3fd5|WGet\MachineFinder|PrairelandPartners|PrairelandPartners
+10870|09dd0723-19a5-40b3-aadc-20ea31718480|WGet\MachineFinder|DekalbImplementCompany|dekalbimpco
+11326|628d977b-9a95-4449-9203-a2cb47df1a67|WGet\MachineFinder|SouthCountryEquipment|southcountry
+11740|c986f117-f4cf-45f2-b1d3-160db42327d6|WGet\MachineFinder|BrooksTractor|BrooksTractor
