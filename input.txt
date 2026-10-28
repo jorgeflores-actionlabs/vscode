@@ -4,3 +4,6 @@
 10870|09dd0723-19a5-40b3-aadc-20ea31718480|WGet\MachineFinder|DekalbImplementCompany|dekalbimpco
 11326|628d977b-9a95-4449-9203-a2cb47df1a67|WGet\MachineFinder|SouthCountryEquipment|southcountry
 11740|c986f117-f4cf-45f2-b1d3-160db42327d6|WGet\MachineFinder|BrooksTractor|BrooksTractor
+11362|27480d60-e35d-4891-85ff-efa8d56f3ea2|HBSSystems|ConroyTractorinc|ConroyTractorinc
+11541|9b2730a3-54d9-45cd-8aab-f6c1cc9e7893|CDKHE|BobcatWestchester|BobcatWestchester
+11560|00fe2cd4-1a77-422c-b34b-6ed72072234d|CDKHE|JordanImplement|JordanImplement
