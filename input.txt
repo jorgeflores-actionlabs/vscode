@@ -16,3 +16,5 @@ EXEC dbo.SQS_SetStagedDealerForProcessing
     @FTPProfileFolder = 'Mahindra',
     @S3ProfileFolder = '7b084e38-36cd-4859-8903-1876c6412217',
     @S3GuidLookup = 0;
+
+    EXEC dbo.SQS_ProcessDealerStagedTable 5032;
