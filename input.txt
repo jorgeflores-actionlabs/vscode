@@ -10,3 +10,9 @@
 5964|8f3ff269-5d93-4e10-9f41-ba5bc791b680|Mahindra||zarembaequipment
 6102|bec51930-9490-4a8e-afcd-12a1ebf61453|Mahindra||eastrutherfordequip
 6238|66ae41a8-b6f4-47cf-beca-e73b744e1766|Mahindra||milehightrailers
+
+EXEC dbo.SQS_SetStagedDealerForProcessing
+    @DealerId = 5260,
+    @FTPProfileFolder = 'Mahindra',
+    @S3ProfileFolder = '7b084e38-36cd-4859-8903-1876c6412217',
+    @S3GuidLookup = 0;
