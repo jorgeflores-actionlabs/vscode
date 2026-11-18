@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 import pyodbc
@@ -8,8 +9,9 @@ SERVER = "sqlag_pdxsql.external.pie.pdx.dealerspike.com"
 DATABASE = "DMS_Imports"
 INPUT_FILE = Path(__file__).with_name("input.txt")
 
-# input.txt contains four required columns separated by "|":
+# input.txt contains four columns separated by "|":
 # DealerId | S3ProfileFolder | FTPProfileFolder | DealerFolderName
+# An empty DealerFolderName is sent as SQL NULL.
 # A fifth value may be present for display/context and is ignored here.
 # The stored procedure requires a fifth parameter that is not included in the file.
 # Use 0 for @S3GuidLookup, as in the original example.
@@ -39,8 +41,8 @@ def validate_dealer_id(value: str, source: str = "DealerId") -> int:
     except ValueError as error:
         raise ValueError(f"{source} must be an integer.") from error
 
-    if dealer_id <= 0:
-        raise ValueError(f"{source} must be a positive integer.")
+    if not 1 <= dealer_id <= 2_147_483_647:
+        raise ValueError(f"{source} must be between 1 and 2147483647.")
 
     return dealer_id
 
@@ -52,19 +54,19 @@ def build_record(
     dealer_folder: str,
     s3_guid_lookup: int = DEFAULT_S3_GUID_LOOKUP,
 ):
-    if not all([s3_profile, ftp_profile, dealer_folder]):
-        raise ValueError("S3ProfileFolder, FTPProfileFolder, and DealerFolderName are required.")
+    if not s3_profile or not ftp_profile:
+        raise ValueError("S3ProfileFolder and FTPProfileFolder are required.")
 
     return (
         dealer_id,
         ftp_profile,
         s3_profile,
-        dealer_folder,
+        dealer_folder or None,
         s3_guid_lookup,
     )
 
 
-def read_input(input_file: Path):
+def read_input(input_file: Path, dealer_id: int | None = None):
     """Read and validate the records that will be sent to the stored procedure."""
     records = []
 
@@ -75,6 +77,14 @@ def read_input(input_file: Path):
                 continue
 
             fields = [field.strip() for field in line.split("|")]
+            if dealer_id is not None:
+                try:
+                    row_dealer_id = int(fields[0])
+                except ValueError:
+                    continue
+                if row_dealer_id != dealer_id:
+                    continue
+
             if len(fields) not in {4, 5}:
                 raise ValueError(
                     f"Line {line_number}: expected 4 or 5 fields separated by '|', "
@@ -82,8 +92,11 @@ def read_input(input_file: Path):
                 )
 
             dealer_id_text, s3_profile, ftp_profile, dealer_folder = fields[:4]
-            if not all(fields[:4]):
-                raise ValueError(f"Line {line_number}: one or more fields are empty.")
+            if not all(fields[:3]):
+                raise ValueError(
+                    f"Line {line_number}: DealerId, S3ProfileFolder, and "
+                    "FTPProfileFolder are required."
+                )
 
             records.append(
                 build_record(
@@ -95,16 +108,11 @@ def read_input(input_file: Path):
             )
 
     if not records:
+        if dealer_id is not None:
+            raise ValueError(f"DealerId {dealer_id} was not found in {input_file}.")
         raise ValueError(f"The file {input_file} contains no records.")
 
     return records
-
-
-def filter_records_by_dealer_id(records, dealer_id: int):
-    matching_records = [record for record in records if record[0] == dealer_id]
-    if not matching_records:
-        raise ValueError(f"DealerId {dealer_id} was not found in {INPUT_FILE}.")
-    return matching_records
 
 
 def consume_results(cursor):
@@ -173,7 +181,7 @@ def main():
         print(f"File mode: loaded {len(records)} record(s) from {INPUT_FILE}.")
     else:
         dealer_id = validate_dealer_id(args.dealer_id)
-        records = filter_records_by_dealer_id(read_input(INPUT_FILE), dealer_id)
+        records = read_input(INPUT_FILE, dealer_id)
         print(f"Single-dealer mode: DealerId={records[0][0]}.")
 
     execute_stored_procedures(records)
@@ -184,4 +192,8 @@ if __name__ == "__main__":
     #   python 1_SQS_SetStagedDealerForProcessing.py
     # Single-dealer mode:
     #   python 1_SQS_SetStagedDealerForProcessing.py 5221
-    main()
+    try:
+        main()
+    except (OSError, ValueError, pyodbc.Error) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        sys.exit(1)

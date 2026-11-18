@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 
 import pyodbc
@@ -49,8 +50,11 @@ def read_dealer_ids(input_file: Path) -> list[int]:
                     f"but found {len(fields)}."
                 )
 
-            if not all(fields[:4]):
-                raise ValueError(f"Line {line_number}: one or more fields are empty.")
+            if not all(fields[:3]):
+                raise ValueError(
+                    f"Line {line_number}: DealerId, S3ProfileFolder, and "
+                    "FTPProfileFolder are required."
+                )
 
             dealer_ids.append(
                 validate_dealer_id(fields[0], source=f"Line {line_number}: DealerId")
@@ -140,6 +144,10 @@ def main():
 
 
 if __name__ == "__main__":
-    # File mode:          python 2_xsl.py
-    # Single-dealer mode: python 2_xsl.py 1785
-    main()
+    # File mode:          python 2_SQS_ProcessDealerStagedTable.py
+    # Single-dealer mode: python 2_SQS_ProcessDealerStagedTable.py 1785
+    try:
+        main()
+    except (OSError, ValueError, pyodbc.Error) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        sys.exit(1)
