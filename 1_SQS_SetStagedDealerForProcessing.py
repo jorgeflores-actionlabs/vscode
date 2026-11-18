@@ -11,7 +11,7 @@ INPUT_FILE = Path(__file__).with_name("input.txt")
 
 # input.txt contains four columns separated by "|":
 # DealerId | S3ProfileFolder | FTPProfileFolder | DealerFolderName
-# An empty DealerFolderName is sent as SQL NULL.
+# DealerFolderName is NOT NULL in staging, so send an empty string for a blank field.
 # A fifth value may be present for display/context and is ignored here.
 # The stored procedure requires a fifth parameter that is not included in the file.
 # Use 0 for @S3GuidLookup, as in the original example.
@@ -61,7 +61,7 @@ def build_record(
         dealer_id,
         ftp_profile,
         s3_profile,
-        dealer_folder or None,
+        dealer_folder,
         s3_guid_lookup,
     )
 
