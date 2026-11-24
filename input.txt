@@ -1,14 +1,4 @@
-362|860c0975-13bd-4a0b-9a3b-334be1e78431|Nizex|JoesCycleShop|joes-cycleshop
-5251|987301df-a9da-49cc-be3f-10688be6727b|CDKLightspeed|IndependentCounty|IndependentCounty
-5032|60ab91ff-ef2b-4464-8fe3-3a3826286ae2|Mahindra||okanogantruckandtractor
-5173|1261eac5-60c4-41d1-ac38-8b4894e5ae95|Mahindra||swainequipment
-5260|7b084e38-36cd-4859-8903-1876c6412217|Mahindra||jtnoutdoorpower
-5333|af47af2b-40d3-4ec3-80ab-fe4481cba4db|Mahindra||ahsalesandservice
-5353|1d5664f8-85d1-4509-b89c-48be7ed4a06d|Mahindra||agpartssupply
-5477|2f6103b6-fdf8-493d-b08e-452e17690178|Mahindra||lowcountryequipment
-5638|69d381f1-9158-46ae-9d0d-7861c52571f2|Mahindra||tractorpro
-5964|8f3ff269-5d93-4e10-9f41-ba5bc791b680|Mahindra||zarembaequipment
-6102|bec51930-9490-4a8e-afcd-12a1ebf61453|Mahindra||eastrutherfordequip
-6238|66ae41a8-b6f4-47cf-beca-e73b744e1766|Mahindra||milehightrailers
-
-5032, 5173, 5260, 5333, 5353, 5477, 5638, 5964, 6102, 6238
+4656|3a433a9a-73e5-4a4d-9689-027ef20e1d51|CDKLightspeed|FlatRockTrailers|flatrocktrailersales
+FlatRockTrailersBelton
+10872|b4d53b74-af17-4536-bc02-0aba6533ad5e|CDKLightspeed|RockyRidgePowersports|RockyRidgePowersports
+RockyRidgeRVIdabel
